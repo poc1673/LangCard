@@ -55,36 +55,53 @@ def count_ngrams(to_check,ngrams_list):
     bool_vals = [list_txt == to_check for list_txt in ngrams_list]
     return(sum(bool_vals))
 
+
+
+# Parse_sentences
+# This function generates a list of sentences from a string object. This is based on the character ". ".
+# Inputs:
+#   [1] A str object to be split.
+
+# Outputs:
+#   [1] A list object containing the individual sentences from the string.    
+def Parse_sentences(string_for_proc):
+    split_period = string_for_proc.split(". ")
+    split_period = [x+"." for x in split_period]
+    return(split_period)
+
+def lookup_sentences(ngram,phrase_list):
+    return([x for x in phrase_list if x.find( " " + ngram+" " ) >=0    ])
+
+def sort_phrases(ngram_list,phrase_list):
+    return_dict = {x :lookup_sentences(ngram = x,phrase_list = phrase_list) for x in ngram_list  }
+    return(return_dict)
+
 # Tokenize_Ngram 
 # Description: 
-
 # Input:
 #   [1] csv file path containing text data. The function will take the values of the csv file, paste them all together.
 #       and then tokenize them based on some range of numbers.
 # Output: 
 #   [1] A dictionary of data frames for each set of ngrams. Each dataframe contains the ngram, its frequency, and its frequency for that specific ngram corpus.
-testing = "C:\\Users\\USER\\Dropbox\\Projects\\Adaptive Flash Cards\\Data\\2019-11-24 Testing Data.csv"
-
+#testing = "C:\\Users\\USER\\Dropbox\\Projects\\Adaptive Flash Cards\\Data\\2019-11-24 Testing Data.csv"
 def Tokenize_Ngram(csv_file_path):
     s1 = pd.read_csv(csv_file_path,encoding='latin-1')
     s2 = reduce_concat(s1.x,sep = " ")
     s3 = clean_text(s2)
+    sentences = Parse_sentences(s3)
     get_ngrams = gen_ngram(s3,  n=1)
     unique_ngrams = np.unique(get_ngrams)
-    result_count = [count_ngrams(word,get_ngrams ) for word in unique_ngrams ]
+    # Map each sentence to each unique ngram.
+    mapped_sentences = sort_phrases(ngram_list=unique_ngrams, phrase_list = sentences)
+    result_count = [count_ngrams(word,get_ngrams) for word in unique_ngrams ]
+    
     count_dict = {unique_ngrams[i]: result_count[i] for i in range(len(unique_ngrams)) }
     ngram_frame =  pd.Series(count_dict).to_frame("Count")    
     ngram_frame["Percent"] = ngram_frame.Count/ngram_frame.Count.sum()
-    return(ngram_frame)
- 
-#hold = Tokenize_Ngram(testing)
-# hold2 = pd.Series(hold).to_frame("test")
+    return( {"Ngram" : ngram_frame , 
+             "Sentences" : mapped_sentences} )
     
-    
-    
-s2.replace("/\t", "",   regex = True)
-s2.replace("|", "")
-pd.replace( )
+#ngram_test = Tokenize_Ngram(testing)
 
 
 
