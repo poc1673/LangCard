@@ -26,4 +26,15 @@ For example, if we have the French verb *etudier*, with some score, *\alpha* wil
 * J'etudie la Francais.
 * Ils
 
-##
+## Next steps:
+
+* Create data-structure to contain the:
+ + Original word to translate.
+ + The sentences.
+ + The "flip-side" of the flash card which contains the translations.
+
+* Submit the information for translation.
+* Save the data-set as a data-set for use in R.
+
+* Consider scoring heuristic for now.
+* Research "recommender" strategy for how to rank submissions in the flash-card.
