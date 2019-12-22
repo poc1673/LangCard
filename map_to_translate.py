@@ -7,23 +7,26 @@ to English using google translate.
 The translated information is then added to a "flipped" version of the flash card.
 @author: USER
 """
-# Peter Caya
-# A quick function which translates a list of text in English into French.
-# This is intended to be a quick wrapper for the google translate function.
 
-from googletrans import Translator
-def francais_anglais(french_text):
-    transl = Translator()
-    translated = transl.translate(text = french_text, dest = 'en',src = 'fr')
-    res = [ [k.origin,k.text] for k in translated]
-    return(res)        
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Dec 14 12:42:27 2019
 
+Contains functions for performing the following:
+    1. Generate ngrams from a csv file.
+    2. Generate sentences and phrases from a csv file.
+    3. Take the output of function #2 and map them to the output of function #1.
+
+@author: USER
+"""
 
 import pandas as pd
 import os
 import functools
 import re
 import numpy as np
+
+import json
 # Function using the functools package to concatenate an iterable into one string object.
 def reduce_concat(x, sep=""):
     return functools.reduce(lambda x, y: str(x) + sep + str(y), x)
@@ -110,8 +113,34 @@ def Tokenize_Ngram(csv_file_path):
 
 
 
+
+# Peter Caya
+# A quick function which translates a list of text in English into French.
+# This is intended to be a quick wrapper for the google translate function.
+
+from googletrans import Translator
+def francais_anglais(french_text):
+    transl = Translator()
+    translated = transl.translate(text = french_text, dest = 'en',src = 'fr')
+    res = [ [k.origin,k.text] for k in translated]
+    return(res)        
+
+
+def gen_english_corpus(french_corpus):
+    keys = ngram_test["Sentences"].keys()
+    english_corpus = { cur_key: {"English": francais_anglais([cur_key]),
+                                 "French Sentence": ngram_test["Sentences"][cur_key],
+                                 "English Sentence" : francais_anglais(ngram_test["Sentences"][cur_key]),} for cur_key in keys }
+    return(english_corpus )
+
+
+  
 testing = "C:\\Users\\USER\\Dropbox\\Projects\\Adaptive Flash Cards\\Data\\2019-11-24 Testing Data.csv"    
 ngram_test = Tokenize_Ngram(testing)
-#ngram_test["Ngram"]
+
+transl_info = gen_english_corpus(ngram_test)
 
 
+with open('Mapping Information.json', 'w') as json_file:
+  json.dump(transl_info, json_file)
+ngram_test["Ngram"].to_csv("Ngrams and Ngram Frequencies.csv")
